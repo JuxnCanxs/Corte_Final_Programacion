@@ -35,7 +35,8 @@ public class Usuario {
         this.rol = rol;
     }
 
-    public boolean verifyPassword(String password) {
-        return this.contraseña.equals(password);
+    public boolean verificarContraseña(String contraseña) {
+        return this.contraseña.equals(contraseña);
     }
 }
+

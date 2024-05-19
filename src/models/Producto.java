@@ -55,7 +55,7 @@ public class Producto {
         this.cantidadEnStock = cantidadEnStock;
     }
 
-    public void updateStock(int cantidad) {
+    public void actualizarCantidadEnStock(int cantidad) {
         this.cantidadEnStock += cantidad;
     }
 }

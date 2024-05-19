@@ -1,90 +1,150 @@
-import models.Venta;
+
+import Controllers.Informe;
 import models.Producto;
 import models.Usuario;
+import models.Venta;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 public class Main {
-    private static List<Producto> productos = new ArrayList<>();
-    private static List<Usuario> usuarios = new ArrayList<>();
-    private static List<Venta> ventas = new ArrayList<>();
+    private static ArrayList<Producto> productos;
+    private static ArrayList<Usuario> usuarios;
+    private static ArrayList<Venta> ventas;
+    private static Informe informe;
 
     public static void main(String[] args) {
+        productos = new ArrayList<>();
+        usuarios = new ArrayList<>();
+        ventas = new ArrayList<>();
+        informe = new Informe();
+
         Scanner scanner = new Scanner(System.in);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        boolean ejecutar = true;
 
-        // Inicializar productos de ejemplo
-        productos.add(new Producto(1, "Producto 1", "Descripción 1", 10.0, 5, LocalDate.of(2023, 12, 31)));
-        productos.add(new Producto(2, "Producto 2", "Descripción 2", 20.0, 10, LocalDate.of(2024, 06, 15)));
+        while (ejecutar) {
+            System.out.println("Opciones:");
+            System.out.println("1. Ingresar Producto");
+            System.out.println("2. Ingresar Usuario");
+            System.out.println("3. Realizar Venta");
+            System.out.println("4. Generar Informe de Ventas");
+            System.out.println("5. Generar Informe de Inventario");
+            System.out.println("6. Salir");
 
-        // Inicializar usuarios de ejemplo
-        usuarios.add(new Usuario("admin", "password", "administrador"));
-        usuarios.add(new Usuario("vendedor", "password", "vendedor"));
-        usuarios.add(new Usuario("gerente", "password", "gerente"));
+            int opcion = scanner.nextInt();
 
-        // Menú principal
-        while (true) {
-            System.out.println("Sistema de Gestión de Inventario para una Tienda de Electrónica");
-            System.out.println("1. Iniciar sesión");
-            System.out.println("2. Salir");
-            System.out.print("Seleccione una opción: ");
-            int option = scanner.nextInt();
-
-            if (option == 1) {
-                System.out.print("Ingrese su nombre de usuario: ");
-                String username = scanner.next();
-                System.out.print("Ingrese su contraseña: ");
-                String password = scanner.next();
-
-                Usuario user = login(username, password);
-                if (user != null) {
-                    switch (Usuario.getRol)) {
-                        case "administrador":
-                            administradorMenu(scanner, formatter);
-                            break;
-                        case "vendedor":
-                            vendedorMenu(scanner, formatter);
-                            break;
-                        case "gerente":
-                            gerenteMenu(scanner, formatter);
-                            break;
-                    }
-                } else {
-                    System.out.println("Nombre de usuario o contraseña incorrectos.");
-                }
-            } else if (option == 2) {
-                break;
-            } else {
-                System.out.println("Opción inválida.");
+            switch (opcion) {
+                case 1:
+                    ingresarProducto();
+                    break;
+                case 2:
+                    ingresarUsuario();
+                    break;
+                case 3:
+                    realizarVenta();
+                    break;
+                case 4:
+                    informe.generarInformeVentas(ventas);
+                    break;
+                case 5:
+                    informe.generarInformeInventario(productos);
+                    break;
+                case 6:
+                    ejecutar = false;
+                    break;
+                default:
+                    System.out.println("Opción no válida");
+                    break;
             }
         }
 
         scanner.close();
     }
 
-    private static Usuario login(String username, String password) {
-        for (Usuario user : usuarios) {
-            if (user.getNombreUsuario().equals(username) && user.verifyPassword(password)) {
-                return user;
-            }
-        }
-        return null;
+    private static void ingresarProducto() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Ingrese el nombre del producto:");
+        String nombre = scanner.nextLine();
+
+        System.out.println("Ingrese la cantidad en stock del producto:");
+        int cantidadEnStock = scanner.nextInt();
+
+        System.out.println("Ingrese el precio del producto:");
+        double precio = scanner.nextDouble();
+
+        Producto producto = new Producto(productos.size() + 1, nombre, cantidadEnStock, precio);
+        productos.add(producto);
+
+        System.out.println("Producto ingresado correctamente");
     }
 
-    private static void administradorMenu(Scanner scanner, DateTimeFormatter formatter) {
-        while (true) {
-            System.out.println("\nMenú de administrador");
-            System.out.println("1. Administrar productos");
-            System.out.println("2. Administrar usuarios");
-            System.out.println("3. Generar informe de inventario");
-            System.out.println("4. Generar informe de ventas");
-            System.out.println("5. Salir");
-            System.out
+    private static void ingresarUsuario() {
+        Scanner scanner = new Scanner(System.in);
 
+        System.out.println("Ingrese el nombre de usuario:");
+        String nombreUsuario = scanner.nextLine();
+
+        System.out.println("Ingrese la contraseña:");
+        String contraseña = scanner.nextLine();
+
+        System.out.println("Ingrese el rol del usuario (Admin, Cajero, Cliente):");
+        String rol = scanner.nextLine();
+
+        Usuario usuario = new Usuario(nombreUsuario, contraseña, rol);
+        usuarios.add(usuario);
+
+        System.out.println("Usuario ingresado correctamente");
+    }
+
+    private static void realizarVenta() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Ingrese el nombre de usuario para realizar la venta:");
+        String nombreUsuario = scanner.nextLine();
+
+        Usuario usuario = usuarios.stream().filter(u -> u.getNombreUsuario().equals(nombreUsuario)).findFirst().orElse(null);
+
+        if (usuario == null) {
+            System.out.println("Usuario no encontrado");
+            return;
+        }
+
+        if (!usuario.getRol().equals("Cajero")) {
+            System.out.println("El usuario no tiene permisos para realizar ventas");
+            return;
+        }
+
+        Venta venta = new Venta(ventas.size() + 1);
+
+        while (true) {
+            System.out.println("Ingrese el id del producto a vender:");
+            int idProducto = scanner.nextInt();
+
+            Producto producto = productos.stream().filter(p -> p.getId() == idProducto).findFirst().orElse(null);
+
+            if (producto == null) {
+                System.out.println("Producto no encontr100% free. 100% original. No reused. Search for 'translate english to spanish' in the internet for more info.");
+                continue;
+            }
+
+            if (producto.getCantidadEnStock() <= 0) {
+                System.out.println("El producto no tiene stock disponible");
+                continue;
+            }
+
+            System.out.println("Ingrese la cantidad a vender:");
+            int cantidad = scanner.nextInt();
+
+            if (cantidad > producto.getCantidadEnStock()) {
+                System.out.println("La cantidad a vender supera la cantidad en stock");
+                continue;
+            }
+
+            producto.actualizarCantidadEnStock(-cantidad);
+            venta.agregarProducto(producto);
+
+            System.out.println("Producto vendido correctamente");
         }
     }
 }
+

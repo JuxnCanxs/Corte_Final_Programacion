@@ -6,11 +6,11 @@ public class Venta {
     private double totalVenta;
     private Date fechaYHora;
 
-    public Venta(int idVenta, ArrayList<Producto> productosVendidos, double totalVenta, Date fechaYHora) {
+    public Venta(int idVenta) {
         this.idVenta = idVenta;
-        this.productosVendidos = productosVendidos;
-        this.totalVenta = totalVenta;
-        this.fechaYHora = fechaYHora;
+        this.productosVendidos = new ArrayList<>();
+        this.totalVenta = 0.0;
+        this.fechaYHora = new Date();
     }
 
     public int getIdVenta() {
@@ -25,35 +25,16 @@ public class Venta {
         return productosVendidos;
     }
 
-    public void setProductosVendidos(ArrayList<Producto> productosVendidos) {
-        this.productosVendidos = productosVendidos;
+    public void agregarProducto(Producto producto) {
+        this.productosVendidos.add(producto);
+        this.totalVenta += producto.getPrecio();
     }
 
     public double getTotalVenta() {
         return totalVenta;
     }
 
-    public void setTotalVenta(double totalVenta) {
-        this.totalVenta = totalVenta;
-    }
-
     public Date getFechaYHora() {
         return fechaYHora;
-    }
-
-    public void setFechaYHora(Date fechaYHora) {
-        this.fechaYHora = fechaYHora;
-    }
-
-    public void addProduct(Producto producto, int cantidad) {
-        this.productosVendidos.add(producto);
-        this.totalVenta += producto.getPrecio() * cantidad;
-    }
-
-    public void calculateTotal() {
-        this.totalVenta = 0;
-        for (Producto producto : productosVendidos) {
-            this.totalVenta += producto.getPrecio();
-        }
     }
 }
